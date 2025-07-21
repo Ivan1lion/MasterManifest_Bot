@@ -3,19 +3,27 @@ import os
 
 
 from aiogram import Bot, Dispatcher, types, F
+from aiogram.enums import ParseMode
+from aiogram.client.bot import DefaultBotProperties
 
+from dotenv import find_dotenv, load_dotenv
+load_dotenv(find_dotenv())
+
+from handlers.for_user import for_user_router
 
 
 
 bot = Bot(token=os.getenv("TOKEN"), default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 
+dp.include_router(for_user_router)
 
 
 
 
 async def main():
-        await dp.start_polling(bot)
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
