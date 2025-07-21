@@ -3,7 +3,22 @@ from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, FSInputFile, CallbackQuery, InputMediaPhoto, PreCheckoutQuery, ContentType, SuccessfulPayment
 
 
+from handlers.text_for_user import text_privacy, text_offer
+
 for_user_router = Router()
+
+
+
+
+# команды для кнопки МЕНЮ
+@for_user_router.message(Command("privacy"))
+async def policy_cmd(message: Message):
+    await message.answer(text_privacy)
+
+
+@for_user_router.message(Command("offer"))
+async def offer_cmd(message: Message):
+    await message.answer(text_offer)
 
 
 @for_user_router.message(CommandStart())
