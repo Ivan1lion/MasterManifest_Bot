@@ -24,9 +24,9 @@ dp.include_router(for_user_router)
 
 async def main():
     await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
     # await bot.set_my_commands(scope=types.BotCommandScopeAllPrivateChats) #команда для удаления кнопки меню
     await bot.set_my_commands(commands=bot_menu, scope=types.BotCommandScopeAllPrivateChats())
+    await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
