@@ -10,6 +10,7 @@ from dotenv import find_dotenv, load_dotenv
 load_dotenv(find_dotenv())
 
 from handlers.for_user import for_user_router
+from comands_menu.bot_menu_cmds import bot_menu
 
 
 
@@ -24,6 +25,8 @@ dp.include_router(for_user_router)
 async def main():
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
+    # await bot.set_my_commands(scope=types.BotCommandScopeAllPrivateChats) #команда для удаления кнопки меню
+    await bot.set_my_commands(commands=bot_menu, scope=types.BotCommandScopeAllPrivateChats())
 
 
 if __name__ == "__main__":
