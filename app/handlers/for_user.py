@@ -1,10 +1,11 @@
 from aiogram import F, Router, types, Bot
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, FSInputFile, CallbackQuery, InputMediaPhoto, PreCheckoutQuery, ContentType, SuccessfulPayment
-
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.handlers.text_for_user import text_privacy, text_offer
 import app.handlers.keyboards as kb
+from app.db.crud import get_or_create_user
 
 
 for_user_router = Router()
@@ -32,7 +33,8 @@ async def offer_cmd(message: Message):
 
 
 @for_user_router.message(CommandStart())
-async def cmd_start(message: Message):
+async def cmd_start(message: Message, bot: Bot, session: AsyncSession):
+    await get_or_create_user(session, message.from_user.id)
     file = FSInputFile("./mediafile_for_bot/start.jpg")
     string = (f"📖 Что такое @MasterManifest_Bot и как он поможет вам?"
               f"\n\nПредставьте, что у вас есть доступ к мудрому собеседнику, который:"
