@@ -9,6 +9,8 @@ from aiogram.client.bot import DefaultBotProperties
 from dotenv import find_dotenv, load_dotenv
 load_dotenv(find_dotenv())
 
+from app.db.config import create_db, drop_db, session_maker
+from app.middlewares.db_session import DataBaseSession
 from app.handlers.for_user import for_user_router
 from app.comands_menu.bot_menu_cmds import bot_menu
 
@@ -21,8 +23,16 @@ dp.include_router(for_user_router)
 
 
 
+async def on_startup(dispatcher: Dispatcher):
+    print("GO bd")
+    # await drop_db() # удаление Базы Данных
+    await create_db() # создание Базы Данных
+
+
 
 async def main():
+    dp.startup.register(on_startup)
+    dp.update.middleware(DataBaseSession(session_pool=session_maker)) # Middleware сессии БД
     await bot.delete_webhook(drop_pending_updates=True)
     # await bot.set_my_commands(scope=types.BotCommandScopeAllPrivateChats) #команда для удаления кнопки меню
     await bot.set_my_commands(commands=bot_menu, scope=types.BotCommandScopeAllPrivateChats())
