@@ -49,5 +49,4 @@ text_offer = (f"<a href='https://telegra.ph/Politika-Konfidencialnosti-11-17-5'>
 # ============ app/main.py ============
 
 
-
 # ============ app/handlers/for_user.py ============
