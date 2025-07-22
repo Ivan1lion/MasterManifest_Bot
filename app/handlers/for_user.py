@@ -56,7 +56,8 @@ async def cmd_start(message: Message):
     ################################################### ОБРАБОТЧИКИ ###################################################
     ###################################################################################################################
 
-    @for_user_router.message(F.photo | F.video | F.animation | F.sticker | F.voice | F.document | F.audio | F.video_note)
+
+    @for_user_router.message(~(F.text))
     async def filter(message: Message):
         await message.delete()
         await message.answer("Запросы только в формате текста")
