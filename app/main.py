@@ -9,8 +9,8 @@ from aiogram.client.bot import DefaultBotProperties
 from dotenv import find_dotenv, load_dotenv
 load_dotenv(find_dotenv())
 
-from handlers.for_user import for_user_router
-from comands_menu.bot_menu_cmds import bot_menu
+from app.handlers.for_user import for_user_router
+from app.comands_menu.bot_menu_cmds import bot_menu
 
 
 

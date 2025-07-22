@@ -3,7 +3,9 @@ from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, FSInputFile, CallbackQuery, InputMediaPhoto, PreCheckoutQuery, ContentType, SuccessfulPayment
 
 
-from handlers.text_for_user import text_privacy, text_offer
+from app.handlers.text_for_user import text_privacy, text_offer
+import app.handlers.keyboards as kb
+
 
 for_user_router = Router()
 
@@ -14,7 +16,9 @@ for_user_router = Router()
 
 @for_user_router.message(Command("balance"))
 async def policy_cmd(message: Message):
-    await message.answer(f"обращение в БД с проверкой оставщегося кол-ва запросов")
+    text_balance = (f"Количество оставшихся запросов: 5"
+                    f"\n\nПополнить баланс можно через кнопки ниже")
+    await message.answer(text_balance, reply_markup=kb.pay)
 
 
 @for_user_router.message(Command("privacy"))
