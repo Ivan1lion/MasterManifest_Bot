@@ -30,12 +30,24 @@ text_offer = (f"<a href='https://telegra.ph/Politika-Konfidencialnosti-11-17-5'>
 
 # 📁 Проектная структура MasterManifest_Bot:
 # ├── app/
-# │   ├── main.py                             # Точка входа, Telegram бот
-# │   ├── comands_menu/
+# │   └── db/
+# │       ├── database.py                     # Подключение и создание сессии
+# │       ├── models.py                       # Описание таблиц
+# │       ├── crud.py                         # CRUD-функции (добавить, найти, обновить)
+# │       └── config.py                       # Настройки подключения
+# │   └── comands_menu/
 # │       └── bot_menu_cmds.py                # назначение кнопок меню
-# │   ├── handlers/
+# │   └── handlers/
 # │       ├── for_user.py                     # Модуль с обработчиками команд (/start, отправка сообщений и т.д.)
 # │       └── text_for_user.py                # Модуль с большими текстами которые отправляет бот пользователю
-# │   ├── mediafile_for_bot/
+# │   └── mediafile_for_bot/
+# │   └── main.py                             # Точка входа, Telegram бот
 # ├── .env
 
+
+
+# ============ app/main.py ============
+
+
+
+# ============ app/handlers/for_user.py ============
