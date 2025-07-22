@@ -1,17 +1,20 @@
-from sqlalchemy import Column, BigInteger, Integer, String, DateTime, func, Boolean
-from sqlalchemy.orm import declarative_base
-from datetime import datetime
-import pytz
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.ext.asyncio import AsyncAttrs
+from sqlalchemy.sql import func
+from sqlalchemy import BigInteger, Integer, String, DateTime
 
-Base = declarative_base()
-moscow_tz = pytz.timezone("Europe/Moscow")
 
+# Кастомный Base-класс с таймстемпом
+class Base(AsyncAttrs, DeclarativeBase):
+    created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+# Модель пользователя
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(BigInteger, primary_key=True, index=True)  # Telegram user_id
-    thread_id = Column(String, nullable=True)  # OpenAI thread_id (один на пользователя)
-    request_count = Column(Integer, default=2)  # Кол-во оставшихся запросов
-    is_subscribed = Column(Boolean, default=False)  # флаг подписки
-    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(moscow_tz))
-    updated_at = Column(DateTime(timezone=True), onupdate=lambda: datetime.now(moscow_tz))
+    id: Mapped[int] = mapped_column(primary_key=True)
+    telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True)
+    thread_id: Mapped[str] = mapped_column(String(128), unique=True)
+    requests_left: Mapped[int] = mapped_column(Integer, default=2)
+

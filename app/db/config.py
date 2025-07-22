@@ -1,17 +1,10 @@
-from pydantic import BaseSettings
+import os
+from dotenv import load_dotenv
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-class DBConfig(BaseSettings):
-    POSTGRES_USER: str = "postgres"
-    POSTGRES_PASSWORD: str = "postgres"
-    POSTGRES_DB: str = "manifest_bot"
-    POSTGRES_HOST: str = "localhost"
-    POSTGRES_PORT: str = "5432"
+load_dotenv()
 
-    @property
-    def db_url(self):
-        return (
-            f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
-            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
-        )
+DATABASE_URL = os.getenv("DATABASE_URL")  # Пример: postgresql+asyncpg://user:pass@localhost:5432/dbname
 
-config = DBConfig()
+engine = create_async_engine(DATABASE_URL, echo=False)
+async_session = async_sessionmaker(engine, expire_on_commit=False)
