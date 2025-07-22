@@ -2,10 +2,12 @@ from aiogram import F, Router, types, Bot
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, FSInputFile, CallbackQuery, InputMediaPhoto, PreCheckoutQuery, ContentType, SuccessfulPayment
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from app.handlers.text_for_user import text_privacy, text_offer
 import app.handlers.keyboards as kb
 from app.db.crud import get_or_create_user
+from app.db.models import User
 
 
 for_user_router = Router()
@@ -16,8 +18,13 @@ for_user_router = Router()
 # команды для кнопки МЕНЮ
 
 @for_user_router.message(Command("balance"))
-async def policy_cmd(message: Message):
-    text_balance = (f"Количество оставшихся запросов: 5"
+async def policy_cmd(message: Message, bot: Bot, session: AsyncSession):
+    result = await session.execute(select(User).where(User.telegram_id == message.from_user.id))
+    user = result.scalar_one_or_none()
+    if user.requests_left == 0:
+        await message.answer("🚫 У вас закончились запросы\n\nПожалуйста, пополните баланс", reply_markup=kb.pay)
+        return
+    text_balance = (f"Количество оставшихся запросов: {user.requests_left}"
                     f"\n\nПополнить баланс можно через кнопки ниже")
     await message.answer(text_balance, reply_markup=kb.pay)
 
@@ -35,7 +42,11 @@ async def offer_cmd(message: Message):
 @for_user_router.message(CommandStart())
 async def cmd_start(message: Message, bot: Bot, session: AsyncSession):
     await get_or_create_user(session, message.from_user.id)
-    file = FSInputFile("./mediafile_for_bot/start.jpg")
+    result = await session.execute(select(User).where(User.telegram_id == message.from_user.id))
+    user = result.scalar_one_or_none()
+    if user.requests_left == 0:
+        await message.answer("🚫 У вас закончились запросы\n\nПожалуйста, пополните баланс", reply_markup=kb.pay)
+        return
     string = (f"📖 Что такое @MasterManifest_Bot и как он поможет вам?"
               f"\n\nПредставьте, что у вас есть доступ к мудрому собеседнику, который:"
               f"\n\n✨ Читал тысячи книг, статей и исследований"
