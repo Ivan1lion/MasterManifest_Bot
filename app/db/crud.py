@@ -1,8 +1,12 @@
 from sqlalchemy import select, update
-from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from .models import User
-import uuid
+from openai import AsyncOpenAI
+import os
+
+
+# Инициализируем OpenAI клиента один раз (можно вынести в отдельный модуль)
+client = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 # Получить пользователя или создать нового
@@ -13,10 +17,14 @@ async def get_or_create_user(session: AsyncSession, telegram_id: int) -> User:
     if user:
         return user
 
-    # Новый пользователь → создать с уникальным thread_id
+    # Новый пользователь → создаём thread через OpenAI
+    thread = await client.beta.threads.create()
+    if not thread or not thread.id:
+        raise RuntimeError("❌ Не удалось создать thread — проверь OpenAI API ключ")
+
     new_user = User(
         telegram_id=telegram_id,
-        thread_id=str(uuid.uuid4()),
+        thread_id=thread.id,  # thread ID с префиксом "thread_..."
         requests_left=2,
     )
     session.add(new_user)
