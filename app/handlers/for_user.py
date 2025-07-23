@@ -82,7 +82,9 @@ async def filter(message: Message):
 
 
 @for_user_router.message(F.text)
-async def handle_text(message: Message, user: User, session: AsyncSession):
+async def handle_text(message: Message, session: AsyncSession):
+    result = await session.execute(select(User).where(User.telegram_id == message.from_user.id))
+    user = result.scalar_one_or_none()
     if user.requests_left == 0:
         await message.answer("❌ У вас закончились запросы.")
         return
@@ -103,3 +105,4 @@ async def handle_text(message: Message, user: User, session: AsyncSession):
         await session.commit()
     except Exception as e:
         await message.answer(f"⚠️ Ошибка при обработке запроса: {str(e)}")
+
