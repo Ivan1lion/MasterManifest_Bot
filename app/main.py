@@ -27,7 +27,7 @@ openai_queue: OpenAIRequestQueue | None = None
 
 async def on_startup(dispatcher: Dispatcher):
     print("GO bd")
-    await drop_db() # удаление Базы Данных
+    # await drop_db() # удаление Базы Данных
     await create_db() # создание Базы Данных
     global openai_queue
     openai_queue = OpenAIRequestQueue()

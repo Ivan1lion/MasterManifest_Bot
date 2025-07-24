@@ -1,8 +1,10 @@
 from aiogram import F, Router, types, Bot
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, FSInputFile, CallbackQuery, InputMediaPhoto, PreCheckoutQuery, ContentType, SuccessfulPayment
+from aiogram.enums import ParseMode
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+
 
 from app.handlers.text_for_user import text_privacy, text_offer
 import app.handlers.keyboards as kb
@@ -41,6 +43,8 @@ async def offer_cmd(message: Message):
     await message.answer(text_offer)
 
 
+
+# команд СТАРТ
 @for_user_router.message(CommandStart())
 async def cmd_start(message: Message, bot: Bot, session: AsyncSession):
     await get_or_create_user(session, message.from_user.id)
@@ -79,30 +83,34 @@ async def filter(message: Message):
         await message.answer("Запросы только в формате текста")
 
 
-
+# обработка запросов пользователя
 
 @for_user_router.message(F.text)
 async def handle_text(message: Message, session: AsyncSession):
     result = await session.execute(select(User).where(User.telegram_id == message.from_user.id))
     user = result.scalar_one_or_none()
     if user.requests_left == 0:
-        await message.answer("❌ У вас закончились запросы.")
+        await message.answer("🚫 У вас закончились запросы\n\nПожалуйста, пополните баланс", reply_markup=kb.pay)
         return
 
     if not openai_queue:
-        await message.answer("Ассистент временно недоступен.")
+        await message.answer("⚠️ Ассистент временно недоступен\n\nПовторите пожалуйста запрос позже")
         return
 
     try:
+        await message.answer("Ожидайте ответ")
         answer = await ask_assistant(
             queue=openai_queue,
             user_id=user.telegram_id,
             thread_id=user.thread_id,
             message=message.text
         )
-        await message.answer(answer)
+        await message.answer(answer, parse_mode=ParseMode.MARKDOWN)
+
         user.requests_left -= 1
         await session.commit()
     except Exception as e:
-        await message.answer(f"⚠️ Ошибка при обработке запроса: {str(e)}")
+        await message.answer(f'⚠️ Ошибка при обработке запроса: {str(e)}\n\nЕсли эта ошибка повторится сообщите '
+                             f'пожалуйста об этом администратору нашего сервиса '
+                             f'<a href="https://t.me/RomanMo_admin">@RomanMo_admin</a>')
 
