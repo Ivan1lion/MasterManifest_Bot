@@ -11,7 +11,7 @@ from sqlalchemy import select
 # import uuid
 
 
-from app.handlers.text_for_user import text_privacy, text_offer, text_hello, text_info
+from app.handlers.text_for_user import text_privacy, text_offer, text_hello, text_info, text_hello2
 import app.handlers.keyboards as kb
 from app.db.crud import get_or_create_user
 from app.db.models import User
@@ -39,10 +39,15 @@ async def policy_cmd(message: Message, bot: Bot, session: AsyncSession):
     result = await session.execute(select(User).where(User.telegram_id == message.from_user.id))
     user = result.scalar_one_or_none()
     if user.requests_left == 0:
-        await message.answer("🚫 У вас закончились запросы\n\nПожалуйста, пополните баланс", reply_markup=kb.pay)
+        await message.answer(f"🚫 У вас закончились запросы"
+                             f"\n\nПожалуйста, пополните баланс"
+                             f"\n\n<a href='https://telegra.ph/Menya-zovut-Daniil--ya-sozdatel-ehtogo-bota-07-25'>"
+                             f"(почему бот стал платным?)</a>", reply_markup=kb.pay)
         return
     text_balance = (f"Количество оставшихся запросов: {user.requests_left}"
-                    f"\n\nПополнить баланс можно через кнопки ниже")
+                    f"\n\nПополнить баланс можно через кнопки ниже"
+                    f"\n\n<a href='https://telegra.ph/Menya-zovut-Daniil--ya-sozdatel-ehtogo-bota-07-25'>"
+                             "(почему бот стал платным?)</a>")
     await message.answer(text_balance, reply_markup=kb.pay)
 
 
@@ -54,6 +59,7 @@ async def offer_cmd(message: Message):
     gif_file = FSInputFile(os.path.abspath(GIF_PATH))
     # Отправляем медиа
     wait_msg = await message.answer_photo(photo=gif_file, caption=text_hello)
+    await message.answer(text_hello2)
 
 
 @for_user_router.message(Command("privacy"))
@@ -95,7 +101,9 @@ async def cmd_start(message: Message, bot: Bot, session: AsyncSession):
     result = await session.execute(select(User).where(User.telegram_id == message.from_user.id))
     user = result.scalar_one_or_none()
     if user.requests_left == 0:
-        await message.answer("🚫 У вас закончились запросы\n\nПожалуйста, пополните баланс", reply_markup=kb.pay)
+        await message.answer(f"🚫 У вас закончились запросы\n\nПожалуйста, пополните баланс"
+                             f"\n\n<a href='https://telegra.ph/Menya-zovut-Daniil--ya-sozdatel-ehtogo-bota-07-25'>"
+                             f"(почему бот стал платным?)</a>", reply_markup=kb.pay)
         return
 
 
@@ -124,7 +132,9 @@ async def handle_text(message: Message, session: AsyncSession, bot: Bot):
     result = await session.execute(select(User).where(User.telegram_id == message.from_user.id))
     user = result.scalar_one_or_none()
     if user.requests_left == 0:
-        await message.answer("🚫 У вас закончились запросы\n\nПожалуйста, пополните баланс", reply_markup=kb.pay)
+        await message.answer(f"🚫 У вас закончились запросы\n\nПожалуйста, пополните баланс"
+                             f"\n\n<a href='https://telegra.ph/Menya-zovut-Daniil--ya-sozdatel-ehtogo-bota-07-25'>"
+                             "(почему бот стал платным?)</a>", reply_markup=kb.pay)
         return
 
     if not openai_queue:
