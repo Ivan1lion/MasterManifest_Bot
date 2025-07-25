@@ -10,10 +10,14 @@ from dotenv import find_dotenv, load_dotenv
 load_dotenv(find_dotenv())
 
 from app.db.config import create_db, drop_db, session_maker
+from app.db.crud import notify_pending_users
 from app.middlewares.db_session import DataBaseSession
 from app.handlers.for_user import for_user_router
 from app.comands_menu.bot_menu_cmds import bot_menu
 from app.openai_assistant.queue import OpenAIRequestQueue
+
+# from app.yookassa.client import init_yookassa
+# from app.yookassa.router import router as yookassa_router
 
 
 
@@ -21,6 +25,7 @@ bot = Bot(token=os.getenv("TOKEN"), default=DefaultBotProperties(parse_mode=Pars
 dp = Dispatcher()
 
 dp.include_router(for_user_router)
+# dp.include_router(yookassa_router)  # 👈 Подключаем router ЮKassa
 
 openai_queue: OpenAIRequestQueue | None = None
 
@@ -29,8 +34,10 @@ async def on_startup(dispatcher: Dispatcher):
     print("GO bd")
     # await drop_db() # удаление Базы Данных
     await create_db() # создание Базы Данных
+    # init_yookassa()  # 🔑 Инициализируем ЮKassa
     global openai_queue
     openai_queue = OpenAIRequestQueue()
+    await notify_pending_users(bot, session_maker)
 
 
 

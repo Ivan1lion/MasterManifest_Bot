@@ -1,3 +1,5 @@
+import asyncio
+import os
 from aiogram import F, Router, types, Bot
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, FSInputFile, CallbackQuery, InputMediaPhoto, PreCheckoutQuery, ContentType, SuccessfulPayment
@@ -5,8 +7,11 @@ from aiogram.enums import ParseMode
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
+# from yookassa import Payment
+# import uuid
 
-from app.handlers.text_for_user import text_privacy, text_offer
+
+from app.handlers.text_for_user import text_privacy, text_offer, text_hello, text_info
 import app.handlers.keyboards as kb
 from app.db.crud import get_or_create_user
 from app.db.models import User
@@ -14,12 +19,20 @@ from app.openai_assistant.client import ask_assistant
 from app.openai_assistant.queue import openai_queue
 
 
+
+
+
+router = Router()
 for_user_router = Router()
 
 
 
 
 # команды для кнопки МЕНЮ
+@for_user_router.message(Command("info"))
+async def policy_cmd(message: Message):
+    await message.answer(text_privacy)
+
 
 @for_user_router.message(Command("balance"))
 async def policy_cmd(message: Message, bot: Bot, session: AsyncSession):
@@ -33,6 +46,16 @@ async def policy_cmd(message: Message, bot: Bot, session: AsyncSession):
     await message.answer(text_balance, reply_markup=kb.pay)
 
 
+@for_user_router.message(Command("hello"))
+async def offer_cmd(message: Message):
+    # Получаем абсолютный путь к медиа-файлу
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    GIF_PATH = os.path.join(BASE_DIR, "..", "mediafile_for_bot", "My_photo.jpg")
+    gif_file = FSInputFile(os.path.abspath(GIF_PATH))
+    # Отправляем медиа
+    wait_msg = await message.answer_photo(photo=gif_file, caption=text_hello)
+
+
 @for_user_router.message(Command("privacy"))
 async def policy_cmd(message: Message):
     await message.answer(text_privacy)
@@ -41,6 +64,10 @@ async def policy_cmd(message: Message):
 @for_user_router.message(Command("offer"))
 async def offer_cmd(message: Message):
     await message.answer(text_offer)
+
+
+
+
 
 
 
@@ -85,8 +112,15 @@ async def filter(message: Message):
 
 # обработка запросов пользователя
 
+# Функция, чтобы крутился индикатор "печатает"
+async def send_typing(bot, chat_id, stop_event):
+    while not stop_event.is_set():
+        await bot.send_chat_action(chat_id=chat_id, action="typing")
+        await asyncio.sleep(4.5)
+
+
 @for_user_router.message(F.text)
-async def handle_text(message: Message, session: AsyncSession):
+async def handle_text(message: Message, session: AsyncSession, bot: Bot):
     result = await session.execute(select(User).where(User.telegram_id == message.from_user.id))
     user = result.scalar_one_or_none()
     if user.requests_left == 0:
@@ -98,19 +132,78 @@ async def handle_text(message: Message, session: AsyncSession):
         return
 
     try:
-        await message.answer("Ожидайте ответ")
+        typing_msg = await message.answer("Master Manifest пишет 💬") # Отправляем текст
+
+        # 🟡 Обновляем статус запроса
+        user.request_status = "pending"
+        await session.commit()
+
+        # Стартуем фоновый "набор текста"
+        stop_event = asyncio.Event()
+        typing_task = asyncio.create_task(send_typing(bot, message.chat.id, stop_event))
+
         answer = await ask_assistant(
             queue=openai_queue,
             user_id=user.telegram_id,
             thread_id=user.thread_id,
             message=message.text
         )
+
+        # Убираем индикаторы
+        stop_event.set()
+        typing_task.cancel()
+        await typing_msg.delete()
+
+
         await message.answer(answer, parse_mode=ParseMode.MARKDOWN)
 
+        # ✅ Запрос выполнен
         user.requests_left -= 1
+        user.request_status = "complete"
         await session.commit()
     except Exception as e:
         await message.answer(f'⚠️ Ошибка при обработке запроса: {str(e)}\n\nЕсли эта ошибка повторится сообщите '
                              f'пожалуйста об этом администратору нашего сервиса '
                              f'<a href="https://t.me/RomanMo_admin">@RomanMo_admin</a>')
+
+
+
+
+# Приём платежа
+
+# Пример колбэков
+@router.callback_query(F.data.startswith("pay"))
+async def handle_payment(callback: types.CallbackQuery):
+    PRICE_MAP = {
+        "pay30": 30,
+        "pay349": 349,
+        "pay1700": 1700,
+    }
+
+    price_code = callback.data
+    amount = PRICE_MAP.get(price_code)
+    if not amount:
+        await callback.answer("Неверная сумма", show_alert=True)
+        return
+
+    payment = Payment.create({
+        "amount": {
+            "value": f"{amount}.00",
+            "currency": "RUB"
+        },
+        "confirmation": {
+            "type": "redirect",
+            "return_url": "https://t.me/your_bot_name"
+        },
+        "capture": True,
+        "description": f"Покупка {amount}₽",
+        "metadata": {
+            "telegram_id": callback.from_user.id
+        }
+    }, uuid.uuid4())
+
+    confirmation_url = payment.confirmation.confirmation_url
+    await callback.message.answer(f"Перейдите по ссылке для оплаты:\n{confirmation_url}")
+    await callback.answer()
+
 
