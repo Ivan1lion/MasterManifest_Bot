@@ -40,14 +40,11 @@ async def policy_cmd(message: Message, bot: Bot, session: AsyncSession):
     user = result.scalar_one_or_none()
     if user.requests_left == 0:
         await message.answer(f"🚫 У вас закончились запросы"
-                             f"\n\nПожалуйста, пополните баланс"
-                             f"\n\n<a href='https://telegra.ph/Menya-zovut-Daniil--ya-sozdatel-ehtogo-bota-07-25'>"
-                             f"(почему бот стал платным?)</a>", reply_markup=kb.pay)
+                             f"\n\nПожалуйста, пополните баланс", reply_markup=kb.pay)
         return
-    text_balance = (f"Количество оставшихся запросов: {user.requests_left}"
-                    f"\n\nПополнить баланс можно через кнопки ниже"
-                    f"\n\n<a href='https://telegra.ph/Menya-zovut-Daniil--ya-sozdatel-ehtogo-bota-07-25'>"
-                             "(почему бот стал платным?)</a>")
+    text_balance = (f"Количество запросов\n"
+                    f"на вашем балансе: [ {user.requests_left} ]"
+                    f"\n\nПополнить баланс можно через кнопки ниже")
     await message.answer(text_balance, reply_markup=kb.pay)
 
 
@@ -96,14 +93,13 @@ async def cmd_start(message: Message, bot: Bot, session: AsyncSession):
               f"\n🌌 Закон притяжения"
               f"\n🌱 Работа с подсознанием и внутренними установками\n"
               f"\nПросто напишите свой вопрос — и получите ответ, вдохновение или пошаговый совет, как изменить свою "
-              f"реальность через мысли и чувства")
+              f"реальность через мысли и чувства"
+              f"\n\n<i>Нажмите на команду</i> /info <i>что бы узнать как правильно вести диалог с ботом</i>")
     await message.answer(text=string)
     result = await session.execute(select(User).where(User.telegram_id == message.from_user.id))
     user = result.scalar_one_or_none()
     if user.requests_left == 0:
-        await message.answer(f"🚫 У вас закончились запросы\n\nПожалуйста, пополните баланс"
-                             f"\n\n<a href='https://telegra.ph/Menya-zovut-Daniil--ya-sozdatel-ehtogo-bota-07-25'>"
-                             f"(почему бот стал платным?)</a>", reply_markup=kb.pay)
+        await message.answer(f"🚫 У вас закончились запросы\n\nПожалуйста, пополните баланс", reply_markup=kb.pay)
         return
 
 
@@ -133,8 +129,8 @@ async def handle_text(message: Message, session: AsyncSession, bot: Bot):
     user = result.scalar_one_or_none()
     if user.requests_left == 0:
         await message.answer(f"🚫 У вас закончились запросы\n\nПожалуйста, пополните баланс"
-                             f"\n\n<a href='https://telegra.ph/Menya-zovut-Daniil--ya-sozdatel-ehtogo-bota-07-25'>"
-                             "(почему бот стал платным?)</a>", reply_markup=kb.pay)
+                             f"\n\n<a href='https://telegra.ph/pvapavp-07-04'>"
+                             "(Почему бот стал платным?)</a>", reply_markup=kb.pay)
         return
 
     if not openai_queue:
