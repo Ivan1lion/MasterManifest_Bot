@@ -41,7 +41,9 @@ class OpenAIRequestQueue:
                     )
                     run = await self.client.beta.threads.runs.create_and_poll(
                         thread_id=request.thread_id,
-                        assistant_id=os.getenv("ASSISTANT_ID")
+                        assistant_id=os.getenv("ASSISTANT_ID"),
+                        temperature = 0.7,
+                        top_p = 0.9
                     )
                     messages = await self.client.beta.threads.messages.list(thread_id=request.thread_id)
                     answer = messages.data[0].content[0].text.value

@@ -31,7 +31,7 @@ for_user_router = Router()
 # команды для кнопки МЕНЮ
 @for_user_router.message(Command("info"))
 async def policy_cmd(message: Message):
-    await message.answer(text_privacy)
+    await message.answer(text_info)
 
 
 @for_user_router.message(Command("balance"))
@@ -52,7 +52,7 @@ async def policy_cmd(message: Message, bot: Bot, session: AsyncSession):
 async def offer_cmd(message: Message):
     # Получаем абсолютный путь к медиа-файлу
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    GIF_PATH = os.path.join(BASE_DIR, "..", "mediafile_for_bot", "My_photo.jpg")
+    GIF_PATH = os.path.join(BASE_DIR, "..", "mediafile_for_bot", "My_photo.png")
     gif_file = FSInputFile(os.path.abspath(GIF_PATH))
     # Отправляем медиа
     wait_msg = await message.answer_photo(photo=gif_file, caption=text_hello)
@@ -138,7 +138,7 @@ async def handle_text(message: Message, session: AsyncSession, bot: Bot):
         return
 
     try:
-        typing_msg = await message.answer("Master Manifest пишет 💬") # Отправляем текст
+        typing_msg = await message.answer("[Mari]: Master Manifest пишет 💬") # Отправляем текст
 
         # 🟡 Обновляем статус запроса
         user.request_status = "pending"
