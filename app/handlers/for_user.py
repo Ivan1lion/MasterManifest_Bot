@@ -236,7 +236,7 @@ async def forward_post_to_users(message: Message, bot: Bot):
                 await bot.forward_message(
                     chat_id=user_id,
                     from_chat_id=channel,
-                    message_id=message.message_id
+                    message_id=message.message_id,
                 )
             except Exception as e:
                 print(f"❌ Ошибка отправки пользователю {user_id}: {e}")
