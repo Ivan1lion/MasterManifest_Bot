@@ -23,3 +23,10 @@ class User(Base):
     slot1: Mapped[str] = mapped_column(String(128), default="idle")
     slot2: Mapped[int] = mapped_column(Integer, default=0)
 
+
+# Модель для постинга
+class ChannelState(Base):
+    __tablename__ = "channel_states"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    last_post_id: Mapped[int] = mapped_column(Integer, default=0)
