@@ -78,7 +78,7 @@ async def offer_cmd(message: Message):
 # команд СТАРТ
 @for_user_router.message(CommandStart())
 async def cmd_start(message: Message, bot: Bot, session: AsyncSession):
-    await get_or_create_user(session, message.from_user.id)
+    await get_or_create_user(session, message.from_user.id, message.from_user.username)
     string = (f"📖 Что такое @MasterManifest_Bot и как он поможет вам?"
               f"\n\nПредставьте, что у вас есть доступ к мудрому собеседнику, который:"
               f"\n\n✨ Читал тысячи книг, статей и исследований"
@@ -139,7 +139,7 @@ async def handle_text(message: Message, session: AsyncSession, bot: Bot):
         return
 
     try:
-        typing_msg = await message.answer("[🙋‍♀️Mari]: Master Manifest пишет 💬") # Отправляем текст
+        typing_msg = await message.answer("💬[ Mari ]: Master Manifest пишет") # Отправляем текст
 
         # 🟡 Обновляем статус запроса
         user.request_status = "pending"

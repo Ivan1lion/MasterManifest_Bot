@@ -15,7 +15,7 @@ channel = int(os.getenv("CHANNEL_ID"))
 
 
 # Получить пользователя или создать нового
-async def get_or_create_user(session: AsyncSession, telegram_id: int) -> User:
+async def get_or_create_user(session: AsyncSession, telegram_id: int, username: str,) -> User:
     # Проверка: есть ли пользователь
     result = await session.execute(select(User).where(User.telegram_id == telegram_id))
     user = result.scalar_one_or_none()
@@ -30,6 +30,7 @@ async def get_or_create_user(session: AsyncSession, telegram_id: int) -> User:
 
     new_user = User(
         telegram_id=telegram_id,
+        username=username,
         thread_id=thread.id,  # 👈 это будет вида thread_abc123...
         requests_left=2,
     )

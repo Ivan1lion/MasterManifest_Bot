@@ -31,4 +31,4 @@ text_hello2 = (f"Поэтому я ввела минимальную оплат�
 
 
 text_info = (f"<a href='https://telegra.ph/CHtoby-otvety-byli-maksimalno-tochnymi-i-poleznymi-vot-neskolko-prostyh-sovetov-07-28'>"
-             f"🙏Читайте до конца. Это важно\n</a>")
+             f"🙏Читайте до конца. Это важно</a>")

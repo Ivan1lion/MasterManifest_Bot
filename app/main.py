@@ -42,7 +42,7 @@ async def on_startup(dispatcher: Dispatcher):
     await bot.set_my_short_description(short_description=f"Меня зовут Мария (можно Mari 🤗). Я разработала этого бота, "
                                                          f"чтобы помогать людям "
                                                          f"\n\nadmin: @RomanMo_admin")
-    # await drop_db() # удаление Базы Данных
+    await drop_db() # удаление Базы Данных
     await create_db() # создание Базы Данных
     # init_yookassa()  # 🔑 Инициализируем ЮKassa
     global openai_queue
