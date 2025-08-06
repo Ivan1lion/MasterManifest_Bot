@@ -19,8 +19,6 @@ from app.handlers.for_user import for_user_router
 from app.comands_menu.bot_menu_cmds import bot_menu
 from app.openai_assistant.queue import OpenAIRequestQueue
 
-# from app.yookassa.client import init_yookassa
-# from app.yookassa.router import router as yookassa_router
 
 
 
@@ -28,7 +26,6 @@ bot = Bot(token=os.getenv("TOKEN"), default=DefaultBotProperties(parse_mode=Pars
 dp = Dispatcher()
 
 dp.include_router(for_user_router)
-# dp.include_router(yookassa_router)  # 👈 Подключаем router ЮKassa
 
 openai_queue: OpenAIRequestQueue | None = None
 
@@ -56,7 +53,6 @@ async def on_startup(dispatcher: Dispatcher):
                                                          f"\n\nadmin: @RomanMo_admin")
     # await drop_db() # удаление Базы Данных
     await create_db() # создание Базы Данных
-    # init_yookassa()  # 🔑 Инициализируем ЮKassa
     global openai_queue
     openai_queue = OpenAIRequestQueue()
     await notify_pending_users(bot, session_maker)
@@ -78,7 +74,7 @@ async def main():
     dp.update.middleware(DataBaseSession(session_pool=session_maker)) # Middleware сессии БД
     # await bot.set_my_commands(scope=types.BotCommandScopeAllPrivateChats) #команда для удаления кнопки меню
     await bot.set_my_commands(commands=bot_menu, scope=types.BotCommandScopeAllPrivateChats())
-    # await dp.start_polling(bot)
+
     # 🌐 Создаём веб-приложение
     app = web.Application()
     SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=WEBHOOK_PATH)

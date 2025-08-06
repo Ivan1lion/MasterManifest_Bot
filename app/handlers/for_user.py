@@ -7,8 +7,7 @@ from aiogram.enums import ParseMode
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-# from yookassa import Payment
-# import uuid
+
 
 
 from app.handlers.text_for_user import text_privacy, text_offer, text_hello, text_info, text_hello2
@@ -22,11 +21,7 @@ from app.openai_assistant.queue import openai_queue
 
 channel = int(os.getenv("CHANNEL_ID"))
 
-
-router = Router()
 for_user_router = Router()
-
-
 
 
 # команды для кнопки МЕНЮ
@@ -179,39 +174,9 @@ async def handle_text(message: Message, session: AsyncSession, bot: Bot):
 # Приём платежа
 
 # Пример колбэков
-@router.callback_query(F.data.startswith("pay"))
-async def handle_payment(callback: types.CallbackQuery):
-    PRICE_MAP = {
-        "pay30": 30,
-        "pay349": 349,
-        "pay1700": 1700,
-    }
 
-    price_code = callback.data
-    amount = PRICE_MAP.get(price_code)
-    if not amount:
-        await callback.answer("Неверная сумма", show_alert=True)
-        return
 
-    payment = Payment.create({
-        "amount": {
-            "value": f"{amount}.00",
-            "currency": "RUB"
-        },
-        "confirmation": {
-            "type": "redirect",
-            "return_url": "https://t.me/your_bot_name"
-        },
-        "capture": True,
-        "description": f"Покупка {amount}₽",
-        "metadata": {
-            "telegram_id": callback.from_user.id
-        }
-    }, uuid.uuid4())
 
-    confirmation_url = payment.confirmation.confirmation_url
-    await callback.message.answer(f"Перейдите по ссылке для оплаты:\n{confirmation_url}")
-    await callback.answer()
 
 
 
