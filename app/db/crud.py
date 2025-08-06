@@ -49,6 +49,16 @@ async def decrement_requests(session: AsyncSession, telegram_id: int) -> None:
     )
     await session.commit()
 
+# Увеличить количество запросов
+async def increment_requests(session: AsyncSession, telegram_id: int, count: int):
+    await session.execute(
+        update(User)
+        .where(User.telegram_id == telegram_id)
+        .values(requests_left=User.requests_left + count)
+    )
+    await session.commit()
+
+
 
 # на случай перезагрузки/сбоя бота
 async def notify_pending_users(bot: Bot, session_factory):

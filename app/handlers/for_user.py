@@ -174,9 +174,79 @@ async def handle_text(message: Message, session: AsyncSession, bot: Bot):
 # Приём платежа
 
 # Пример колбэков
+@for_user_router.callback_query(F.data.startswith("pay"))
+async def process_payment(callback: CallbackQuery, bot: Bot, session: AsyncSession):
+    from uuid import uuid4
+    import aiohttp
+    import base64
+    import os
 
+    telegram_id = callback.from_user.id
+    amount_map = {
+        "pay30": 30,
+        "pay349": 349,
+        "pay1700": 1700
+    }
 
+    data_key = callback.data
+    amount = amount_map.get(data_key)
+    if not amount:
+        await callback.answer("Неизвестная сумма", show_alert=True)
+        return
 
+    return_url = f"https://t.me/{(await bot.me()).username}"
+
+    payment_payload = {
+        "amount": {
+            "value": f"{amount:.2f}",
+            "currency": "RUB"
+        },
+        "confirmation": {
+            "type": "redirect",
+            "return_url": return_url
+        },
+        "capture": True,
+        "description": f"Покупка на {amount}₽",
+        "metadata": {
+            "telegram_id": str(telegram_id)
+        }
+    }
+
+    def base64_auth():
+        shop_id = os.getenv("YOOKASSA_SHOP_ID")
+        secret = os.getenv("YOOKASSA_SECRET_KEY")
+        raw = f"{shop_id}:{secret}".encode()
+        return base64.b64encode(raw).decode()
+
+    headers = {
+        "Authorization": f"Basic {base64_auth()}",
+        "Content-Type": "application/json",
+        "Idempotence-Key": str(uuid4())
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session_http:
+            async with session_http.post(
+                url="https://api.yookassa.ru/v3/payments",
+                json=payment_payload,
+                headers=headers
+            ) as resp:
+                payment_response = await resp.json()
+
+        print("📦 Ответ от ЮKassa:", payment_response)
+
+        if "confirmation" not in payment_response:
+            error_text = payment_response.get("description", "Нет поля confirmation")
+            await callback.message.answer(f"❌ Ошибка ЮKassa: {error_text}")
+            return
+
+        confirmation_url = payment_response["confirmation"]["confirmation_url"]
+        await callback.message.answer(f"💳 Перейдите по ссылке для оплаты:\n\n{confirmation_url}")
+        await callback.answer()
+
+    except Exception as e:
+        print("❌ Ошибка при создании платежа:", e)
+        await callback.message.answer("Ошибка при попытке создать платёж. Подробности в логах.")
 
 
 
@@ -208,6 +278,7 @@ async def forward_post_to_users(message: Message, bot: Bot):
 
         # Обновляем last_post_id
         await set_last_post_id(session, message.message_id)
+
 
 
 

@@ -18,6 +18,8 @@ from app.middlewares.db_session import DataBaseSession
 from app.handlers.for_user import for_user_router
 from app.comands_menu.bot_menu_cmds import bot_menu
 from app.openai_assistant.queue import OpenAIRequestQueue
+from app.payments.payment_routes import yookassa_webhook_handler
+
 
 
 
@@ -41,6 +43,11 @@ WEBAPP_PORT = 8000
 async def on_startup(dispatcher: Dispatcher):
     print("GO bd")
     await bot.set_webhook(url=WEBHOOK_URL, drop_pending_updates=True)
+    # await bot.set_webhook(
+    #     url=WEBHOOK_URL,
+    #     drop_pending_updates=True,
+    #     allowed_updates=["message", "callback_query"]
+    # )
     await bot.set_my_description(description=f"Бот-помощник отвечает на вопросы по материализации желания, трансформации "
                                        f"мышления, философии богатства, закону притяжения, манифестации "
                                        f"\n\nВ боте собраны и структурированы учения таких людей как Neville Goddard, "
@@ -77,6 +84,7 @@ async def main():
 
     # 🌐 Создаём веб-приложение
     app = web.Application()
+    app.router.add_post("/yookassa/webhook", yookassa_webhook_handler)
     SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=WEBHOOK_PATH)
     setup_application(app, dp, bot=bot)
     app.on_shutdown.append(on_shutdown)
