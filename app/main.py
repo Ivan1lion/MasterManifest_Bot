@@ -42,12 +42,14 @@ WEBAPP_PORT = 8000
 
 async def on_startup(dispatcher: Dispatcher):
     print("GO bd")
-    await bot.set_webhook(url=WEBHOOK_URL, drop_pending_updates=True)
-    # await bot.set_webhook(
-    #     url=WEBHOOK_URL,
-    #     drop_pending_updates=True,
-    #     allowed_updates=["message", "callback_query"]
-    # )
+    await bot.set_webhook(
+        url=WEBHOOK_URL,
+        drop_pending_updates=True,
+        allowed_updates=["message", "edited_message", "callback_query", "inline_query", "chosen_inline_result",
+                         "callback_query", "shipping_query", "pre_checkout_query", "poll", "poll_answer",
+                         "my_chat_member", "chat_member", "chat_join_request", "channel_post", "edited_channel_post"]
+    )
+    # await bot.set_webhook(url=WEBHOOK_URL, drop_pending_updates=True)
     await bot.set_my_description(description=f"Бот-помощник отвечает на вопросы по материализации желания, трансформации "
                                        f"мышления, философии богатства, закону притяжения, манифестации "
                                        f"\n\nВ боте собраны и структурированы учения таких людей как Neville Goddard, "

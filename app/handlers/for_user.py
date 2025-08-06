@@ -1,5 +1,8 @@
 import asyncio
 import os
+from uuid import uuid4
+import aiohttp
+import base64
 from aiogram import F, Router, types, Bot
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, FSInputFile, CallbackQuery, InputMediaPhoto, PreCheckoutQuery, ContentType, SuccessfulPayment
@@ -174,14 +177,8 @@ async def handle_text(message: Message, session: AsyncSession, bot: Bot):
 
 # Приём платежа
 
-# Пример колбэков
 @for_user_router.callback_query(F.data.startswith("pay"))
 async def process_payment(callback: CallbackQuery, bot: Bot, session: AsyncSession):
-    from uuid import uuid4
-    import aiohttp
-    import base64
-    import os
-
     telegram_id = callback.from_user.id
     amount_map = {
         "pay30": 30,
@@ -242,11 +239,10 @@ async def process_payment(callback: CallbackQuery, bot: Bot, session: AsyncSessi
             return
 
         confirmation_url = payment_response["confirmation"]["confirmation_url"]
-        # await callback.message.answer(f"💳 Перейдите по ссылке для оплаты:\n\n{confirmation_url}")
         await callback.message.answer(
             f'Вы приобретаете дополнительные запросы'
-            f'\n\nОплата производится через Yoomoney (cервис электронных платежей ПАО "Сбербанк")'
-            f'\n\nПосле успешной оплаты, они отобразятся в разделе -> ⭐️ Баланс',
+            f'\n\nПосле успешной оплаты, они отобразятся в разделе -> ⭐️ Баланс'
+            f'\n\n<blockquote>Оплата производится через Yoomoney (cервис электронных платежей ПАО "Сбербанк")</blockquote>',
             reply_markup=payment_button_keyboard(confirmation_url)
         )
         await callback.answer()

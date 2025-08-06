@@ -60,6 +60,8 @@ async def increment_requests(session: AsyncSession, telegram_id: int, count: int
 
 
 
+
+
 # на случай перезагрузки/сбоя бота
 async def notify_pending_users(bot: Bot, session_factory):
     async with session_factory() as session:

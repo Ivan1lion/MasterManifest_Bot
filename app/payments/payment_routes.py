@@ -30,3 +30,4 @@ async def yookassa_webhook_handler(request: web.Request):
         return web.Response(status=200, text="OK")
     except Exception as e:
         return web.Response(status=500, text=f"Error: {e}")
+
