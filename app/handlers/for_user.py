@@ -12,6 +12,7 @@ from sqlalchemy import select
 
 from app.handlers.text_for_user import text_privacy, text_offer, text_hello, text_info, text_hello2
 import app.handlers.keyboards as kb
+from app.handlers.keyboards import payment_button_keyboard
 from app.db.crud import get_or_create_user, get_last_post_id, set_last_post_id
 from app.db.models import User
 from app.db.config import session_maker
@@ -241,7 +242,13 @@ async def process_payment(callback: CallbackQuery, bot: Bot, session: AsyncSessi
             return
 
         confirmation_url = payment_response["confirmation"]["confirmation_url"]
-        await callback.message.answer(f"💳 Перейдите по ссылке для оплаты:\n\n{confirmation_url}")
+        # await callback.message.answer(f"💳 Перейдите по ссылке для оплаты:\n\n{confirmation_url}")
+        await callback.message.answer(
+            f'Вы приобретаете дополнительные запросы'
+            f'\n\nОплата производится через Yoomoney (cервис электронных платежей ПАО "Сбербанк")'
+            f'\n\nПосле успешной оплаты, они отобразятся в разделе -> ⭐️ Баланс',
+            reply_markup=payment_button_keyboard(confirmation_url)
+        )
         await callback.answer()
 
     except Exception as e:
