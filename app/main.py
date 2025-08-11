@@ -58,7 +58,7 @@ async def on_startup(dispatcher: Dispatcher):
                                              f"\n\n📚 В основе бота — учения Neville Goddard, Bob Proctor, Napoleon Hill, "
                                              f"Joe Dispenza, Вадима Зеланда и других мастеров "
                                              )
-    await bot.set_my_short_description(short_description=f"Меня зовут Анна Артюхова (можно Ann 🤗). Я разработала этого бота, "
+    await bot.set_my_short_description(short_description=f"Меня зовут Мария (можно Mari 🤗). Я разработала этого бота, "
                                                          f"чтобы помогать людям "
                                                          f"\n\nadmin: @RomanMo_admin")
     # await drop_db() # удаление Базы Данных
