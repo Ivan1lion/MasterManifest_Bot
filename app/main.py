@@ -36,7 +36,7 @@ openai_queue: OpenAIRequestQueue | None = None
 WEBHOOK_PATH = "/webhook"
 WEBHOOK_HOST = os.getenv("WEBHOOK_HOST")
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
-WEBAPP_HOST = "localhost"
+WEBAPP_HOST = "0.0.0.0"
 WEBAPP_PORT = 8000
 
 
@@ -87,6 +87,11 @@ async def main():
 
     # 🌐 Создаём веб-приложение
     app = web.Application()
+
+    async def health(request):
+        return web.Response(text="ok")     #для проверки доступности контейнера и для Caddy
+    app.router.add_get("/health", health)
+
     app.router.add_post("/yookassa/webhook", yookassa_webhook_handler)
     SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=WEBHOOK_PATH)
     setup_application(app, dp, bot=bot)
