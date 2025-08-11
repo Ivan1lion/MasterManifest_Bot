@@ -43,7 +43,7 @@ class OpenAIRequestQueue:
                         thread_id=request.thread_id,
                         assistant_id=os.getenv("ASSISTANT_ID"),
                         temperature = 0.7,
-                        top_p = 0.9
+                        top_p = 1
                     )
                     messages = await self.client.beta.threads.messages.list(thread_id=request.thread_id)
                     answer = messages.data[0].content[0].text.value

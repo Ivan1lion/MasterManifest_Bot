@@ -22,9 +22,9 @@ async def yookassa_webhook_handler(request: web.Request):
         async with session_maker() as session:
             if amount == 30:
                 await increment_requests(session, telegram_id, count=1)
-            elif amount == 349:
+            elif amount == 550:
                 await increment_requests(session, telegram_id, count=20)
-            elif amount == 1700:
+            elif amount == 2500:
                 await increment_requests(session, telegram_id, count=100)
 
         return web.Response(status=200, text="OK")
