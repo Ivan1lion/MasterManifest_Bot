@@ -3,6 +3,7 @@ import os
 
 
 from aiogram import Bot, Dispatcher, types, F
+from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.enums import ParseMode
 from aiogram.client.bot import DefaultBotProperties
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
@@ -16,6 +17,7 @@ from app.db.config import create_db, drop_db, session_maker
 from app.db.crud import notify_pending_users, fetch_and_send_unsent_post
 from app.middlewares.db_session import DataBaseSession
 from app.handlers.for_user import for_user_router
+from app.handlers.payments import for_user_router as payments_router
 from app.comands_menu.bot_menu_cmds import bot_menu
 from app.openai_assistant.queue import OpenAIRequestQueue
 from app.payments.payment_routes import yookassa_webhook_handler
@@ -23,11 +25,12 @@ from app.payments.payment_routes import yookassa_webhook_handler
 
 
 
-
+storage = MemoryStorage()
 bot = Bot(token=os.getenv("TOKEN"), default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-dp = Dispatcher()
+dp = Dispatcher(storage=storage)
 
 dp.include_router(for_user_router)
+dp.include_router(payments_router)
 
 openai_queue: OpenAIRequestQueue | None = None
 
