@@ -19,4 +19,6 @@ COPY . /app
 RUN useradd -m botuser || true
 USER botuser
 
-CMD ["python", "-u", "main.py"]
+CMD ["python", "-m", "app.main"]
+
+

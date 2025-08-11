@@ -1,8 +1,5 @@
 bot.mastermanifest.ru {
     reverse_proxy bot:8000
     encode zstd gzip
-    tls {
-        # можно прописать email для Let's Encrypt уведомлений
-        email zamkomvzvod3@yandex.ru
-    }
+    tls zamkomvzvod3@yandex.ru
 }
