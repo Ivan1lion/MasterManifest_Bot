@@ -21,6 +21,7 @@ class User(Base):
     requests_left: Mapped[int] = mapped_column(Integer, default=3)
     request_status: Mapped[str] = mapped_column(String(20), default="idle")
     email: Mapped[str] = mapped_column(String(128), default="idle")
+    auto_post: Mapped[str] = mapped_column(String(128), default="idle")
     slot1: Mapped[str] = mapped_column(String(128), default="idle")
     slot2: Mapped[int] = mapped_column(Integer, default=0)
 

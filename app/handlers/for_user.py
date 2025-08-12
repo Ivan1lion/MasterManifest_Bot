@@ -130,6 +130,23 @@ async def handle_text(message: Message, session: AsyncSession, bot: Bot):
         await message.answer(f"🚫 У вас закончились запросы\n\nПожалуйста, пополните баланс"
                              f"\n\n<a href='https://telegra.ph/pvapavp-07-04'>"
                              "(Почему бот стал платным?)</a>", reply_markup=kb.pay)
+        # Проверяем auto_post
+        if user.auto_post == "idle":
+            user.auto_post = "post_true"
+            await session.commit()
+
+            async def send_delayed_post():
+                await asyncio.sleep(120)  # Ждём 2 минуты
+                try:
+                    await bot.forward_message(
+                        chat_id=message.chat.id,
+                        from_chat_id=-1002837737377,  # ID канала
+                        message_id=19  # ID сообщения
+                    )
+                except Exception as e:
+                    print(f"Ошибка пересылки сообщения: {e}")
+
+            asyncio.create_task(send_delayed_post())
         return
 
     if not openai_queue:
