@@ -17,7 +17,6 @@ from app.db.config import create_db, drop_db, session_maker
 from app.db.crud import notify_pending_users, fetch_and_send_unsent_post
 from app.middlewares.db_session import DataBaseSession
 from app.handlers.for_user import for_user_router
-from app.handlers.payments import for_user_router as payments_router
 from app.comands_menu.bot_menu_cmds import bot_menu
 from app.openai_assistant.queue import OpenAIRequestQueue
 from app.payments.payment_routes import yookassa_webhook_handler
@@ -30,7 +29,6 @@ bot = Bot(token=os.getenv("TOKEN"), default=DefaultBotProperties(parse_mode=Pars
 dp = Dispatcher(storage=storage)
 
 dp.include_router(for_user_router)
-dp.include_router(payments_router)
 
 openai_queue: OpenAIRequestQueue | None = None
 
@@ -52,7 +50,6 @@ async def on_startup(dispatcher: Dispatcher):
                          "callback_query", "shipping_query", "pre_checkout_query", "poll", "poll_answer",
                          "my_chat_member", "chat_member", "chat_join_request", "channel_post", "edited_channel_post"]
     )
-    # await bot.set_webhook(url=WEBHOOK_URL, drop_pending_updates=True)
     await bot.set_my_description(description=f"✨ Представь, что у тебя есть доступ к мудрому собеседнику, который: "
                                              f"\n\n- Читал тысячи книг, статей и исследований "
                                              f"\n- Понимает, как устроено мышление и как работают твои убеждения "

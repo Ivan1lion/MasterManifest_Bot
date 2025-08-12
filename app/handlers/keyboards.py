@@ -9,7 +9,7 @@ pay = InlineKeyboardMarkup(inline_keyboard=[
      [InlineKeyboardButton(text="100 запросов - 2500р.", callback_data="pay2500")],
                                               ])
 
-# def payment_button_keyboard(confirmation_url: str) -> InlineKeyboardMarkup:
-#     return InlineKeyboardMarkup(inline_keyboard=[
-#         [InlineKeyboardButton(text="💳 Перейти к оплате", url=confirmation_url)]
-#     ])
+def payment_button_keyboard(confirmation_url: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="💳 Перейти к оплате", url=confirmation_url)]
+    ])

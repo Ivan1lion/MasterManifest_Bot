@@ -11,6 +11,8 @@ services:
       - db_data:/var/lib/postgresql/data
     networks:
       - backend
+    ports:
+      - "5432:5432"
 
   bot:
     build: .
