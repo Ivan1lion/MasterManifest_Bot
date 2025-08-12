@@ -140,7 +140,7 @@ async def handle_text(message: Message, session: AsyncSession, bot: Bot):
                 try:
                     await bot.forward_message(
                         chat_id=message.chat.id,
-                        from_chat_id=-1002837737377,  # ID канала
+                        from_chat_id=-1002837737377,
                         message_id=19  # ID сообщения
                     )
                 except Exception as e:
